@@ -1,4 +1,5 @@
-const CACHE_NAME = "calculadora-financeira-v1";
+
+const CACHE_NAME = "calculadora-financeira-v2";
 
 const ARQUIVOS = [
     "./",
@@ -13,17 +14,14 @@ const ARQUIVOS = [
 self.addEventListener("install", event => {
 
     event.waitUntil(
-
         caches.open(CACHE_NAME).then(cache => {
             return cache.addAll(ARQUIVOS);
         })
-
     );
 
     self.skipWaiting();
 
 });
-
 
 // ATIVAÇÃO
 
@@ -49,7 +47,6 @@ self.addEventListener("activate", event => {
 
 });
 
-
 // CACHE E FUNCIONAMENTO OFFLINE
 
 self.addEventListener("fetch", event => {
@@ -60,9 +57,14 @@ self.addEventListener("fetch", event => {
 
     const url = new URL(requisicao.url);
 
-    // Arquivos do Tailwind CDN
+    // BIBLIOTECAS EXTERNAS
 
-    if (url.hostname === "cdn.tailwindcss.com") {
+    const bibliotecasExternas = [
+        "cdn.tailwindcss.com",
+        "cdn.jsdelivr.net"
+    ];
+
+    if (bibliotecasExternas.includes(url.hostname)) {
 
         event.respondWith(
 
@@ -89,9 +91,10 @@ self.addEventListener("fetch", event => {
 
                 } catch (erro) {
 
-                    return new Response("", {
-                        status: 503
-                    });
+                    return new Response(
+                        "Biblioteca indisponível offline.",
+                        { status: 503 }
+                    );
 
                 }
 
@@ -103,7 +106,7 @@ self.addEventListener("fetch", event => {
 
     }
 
-    // Arquivos do próprio aplicativo
+    // ARQUIVOS DO APLICATIVO
 
     if (url.origin === self.location.origin) {
 
@@ -114,7 +117,9 @@ self.addEventListener("fetch", event => {
                 if (resposta) return resposta;
 
                 try {
+
                     return await fetch(requisicao);
+
                 } catch (erro) {
 
                     if (requisicao.mode === "navigate") {
@@ -123,9 +128,10 @@ self.addEventListener("fetch", event => {
 
                     }
 
-                    return new Response("Arquivo indisponível offline.", {
-                        status: 503
-                    });
+                    return new Response(
+                        "Arquivo indisponível offline.",
+                        { status: 503 }
+                    );
 
                 }
 
