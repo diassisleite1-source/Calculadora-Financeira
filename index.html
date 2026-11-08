@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#101827">
+<meta name="description" content="Calculadora e comparador de investimentos.">
 
 <title>Calculadora Financeira</title>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon-192.svg" type="image/svg+xml">
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -36,27 +40,19 @@ input, select, button { font-size: 16px; }
 .botao {
     min-height: 50px;
     border-radius: 12px;
+    padding: 12px;
     font-weight: bold;
     transition: .2s;
 }
 
-.resultado {
+.resultado, .investimento {
     background: #1e293b;
     border: 1px solid #334155;
     border-radius: 14px;
     padding: 16px;
 }
 
-.investimento {
-    background: #1e293b;
-    border: 1px solid #334155;
-    border-radius: 14px;
-    padding: 16px;
-}
-
-.investimento.melhor {
-    border: 2px solid #4ade80;
-}
+.investimento.melhor { border: 2px solid #4ade80; }
 
 .barra {
     height: 10px;
@@ -74,7 +70,7 @@ input, select, button { font-size: 16px; }
 .tabela {
     width: 100%;
     border-collapse: collapse;
-    min-width: 520px;
+    min-width: 500px;
 }
 
 .tabela th, .tabela td {
@@ -85,9 +81,7 @@ input, select, button { font-size: 16px; }
 }
 
 .tabela th:first-child,
-.tabela td:first-child {
-    text-align: left;
-}
+.tabela td:first-child { text-align: left; }
 
 .tabela th {
     color: #94a3b8;
@@ -100,12 +94,6 @@ input, select, button { font-size: 16px; }
 .azul { color: #38bdf8; }
 .erro { color: #f87171; }
 
-.secao-titulo {
-    font-size: 19px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
 .tag {
     display: inline-block;
     padding: 5px 9px;
@@ -114,6 +102,12 @@ input, select, button { font-size: 16px; }
     color: #86efac;
     font-size: 11px;
     font-weight: bold;
+}
+
+.secao-titulo {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 15px;
 }
 
 @media(max-width:380px) {
@@ -126,8 +120,6 @@ input, select, button { font-size: 16px; }
 
 <div class="max-w-xl mx-auto px-4 py-6">
 
-<!-- CABEÇALHO -->
-
 <header class="mb-7">
 
     <div class="flex items-center gap-3 mb-3">
@@ -137,10 +129,7 @@ input, select, button { font-size: 16px; }
         </div>
 
         <div>
-            <h1 class="text-xl font-bold">
-                Calculadora Financeira
-            </h1>
-
+            <h1 class="text-xl font-bold">Calculadora Financeira</h1>
             <p class="text-slate-400 text-sm">
                 Simule, compare e planeje seus investimentos
             </p>
@@ -156,19 +145,16 @@ input, select, button { font-size: 16px; }
 </header>
 
 
-<!-- DADOS DO INVESTIMENTO -->
+<!-- DADOS -->
 
 <section class="bg-slate-800 rounded-2xl p-5 mb-5">
 
-    <h2 class="secao-titulo">
-        💰 Dados do investimento
-    </h2>
+    <h2 class="secao-titulo">💰 Dados do investimento</h2>
 
     <div class="mb-4">
         <label class="block text-sm text-slate-300 mb-2">
             Valor inicial (R$)
         </label>
-
         <input id="inicial" class="campo"
         type="number" min="0" step="0.01" value="1000">
     </div>
@@ -177,7 +163,6 @@ input, select, button { font-size: 16px; }
         <label class="block text-sm text-slate-300 mb-2">
             Aporte mensal (R$)
         </label>
-
         <input id="aporte" class="campo"
         type="number" min="0" step="0.01" value="200">
     </div>
@@ -186,16 +171,14 @@ input, select, button { font-size: 16px; }
         <label class="block text-sm text-slate-300 mb-2">
             CDI anual de referência (%)
         </label>
-
         <input id="cdi" class="campo"
         type="number" min="0" step="0.01" value="10">
-
         <p class="text-xs text-slate-400 mt-2">
-            Altere conforme a taxa CDI que deseja utilizar na simulação.
+            Informe a taxa CDI que deseja utilizar na simulação.
         </p>
     </div>
 
-    <div class="mb-4">
+    <div class="mb-5">
         <label class="block text-sm text-slate-300 mb-2">
             Período do investimento
         </label>
@@ -228,31 +211,25 @@ input, select, button { font-size: 16px; }
 </section>
 
 
-<!-- COMPARADOR -->
+<!-- RESULTADOS -->
 
 <section id="areaComparacao" class="hidden">
 
-    <h2 class="secao-titulo">
-        🏆 Comparador de investimentos
-    </h2>
+    <h2 class="secao-titulo">🏆 Comparador de investimentos</h2>
 
     <p class="text-sm text-slate-400 mb-4">
-        Veja quanto seu dinheiro poderá acumular em cada modalidade.
+        Compare o patrimônio líquido estimado de cada modalidade.
     </p>
 
-    <div id="melhorInvestimento"
-    class="bg-emerald-950 border border-emerald-800 rounded-2xl p-5 mb-4">
+    <div class="bg-emerald-950 border border-emerald-800 rounded-2xl p-5 mb-4">
 
         <p class="text-emerald-300 text-sm mb-2">
             Melhor resultado estimado
         </p>
 
-        <h2 id="nomeMelhor" class="text-xl font-bold">
-            -
-        </h2>
+        <h2 id="nomeMelhor" class="text-xl font-bold">-</h2>
 
-        <p id="valorMelhor"
-        class="text-2xl font-bold text-white mt-2">
+        <p id="valorMelhor" class="text-2xl font-bold text-white mt-2">
             R$ 0,00
         </p>
 
@@ -262,25 +239,13 @@ input, select, button { font-size: 16px; }
 
     </div>
 
+    <div id="cardsInvestimentos" class="grid grid-cols-1 gap-3 mb-6"></div>
 
-    <!-- CARDS -->
-
-    <div id="cardsInvestimentos" class="grid grid-cols-1 gap-3 mb-6">
-    </div>
-
-
-    <!-- TABELA COMPARATIVA -->
-
-    <h2 class="secao-titulo">
-        📋 Comparação detalhada
-    </h2>
+    <h2 class="secao-titulo">📋 Comparação detalhada</h2>
 
     <div class="resultado overflow-hidden mb-6">
-
         <div class="overflow-x-auto">
-
             <table class="tabela">
-
                 <thead>
                     <tr>
                         <th>Investimento</th>
@@ -289,54 +254,27 @@ input, select, button { font-size: 16px; }
                         <th>Líquido</th>
                     </tr>
                 </thead>
-
                 <tbody id="tabelaComparacao"></tbody>
-
             </table>
-
         </div>
-
     </div>
 
+    <h2 class="secao-titulo">📊 Comparação visual</h2>
 
-    <!-- GRÁFICO SIMPLES -->
+    <div id="grafico" class="resultado mb-6"></div>
 
-    <h2 class="secao-titulo">
-        📊 Comparação visual
-    </h2>
-
-    <div id="grafico" class="resultado mb-6">
-    </div>
-
-
-    <!-- CALCULADORA INDIVIDUAL -->
-
-    <h2 class="secao-titulo">
-        💵 Simulação de juros compostos
-    </h2>
+    <h2 class="secao-titulo">💵 Simulação de juros compostos</h2>
 
     <div class="grid grid-cols-2 gap-3 mb-3">
 
         <div class="resultado">
-            <p class="text-xs text-slate-400 mb-2">
-                Total investido
-            </p>
-
-            <h3 id="investido"
-            class="text-lg font-bold">
-                R$ 0,00
-            </h3>
+            <p class="text-xs text-slate-400 mb-2">Total investido</p>
+            <h3 id="investido" class="text-lg font-bold">R$ 0,00</h3>
         </div>
 
         <div class="resultado">
-            <p class="text-xs text-slate-400 mb-2">
-                Juros ganhos
-            </p>
-
-            <h3 id="juros"
-            class="text-lg font-bold verde">
-                R$ 0,00
-            </h3>
+            <p class="text-xs text-slate-400 mb-2">Juros ganhos</p>
+            <h3 id="juros" class="text-lg font-bold verde">R$ 0,00</h3>
         </div>
 
     </div>
@@ -347,33 +285,21 @@ input, select, button { font-size: 16px; }
             Taxa mensal equivalente do CDI
         </p>
 
-        <p id="taxaEquivalente" class="text-lg font-bold azul">
-            0%
-        </p>
+        <p id="taxaEquivalente" class="text-lg font-bold azul">0%</p>
 
         <p class="text-sm text-slate-400 mt-3">
             Tempo total
         </p>
 
-        <p id="tempoTotal" class="text-lg font-bold">
-            0 meses
-        </p>
+        <p id="tempoTotal" class="text-lg font-bold">0 meses</p>
 
     </div>
 
+    <h2 class="secao-titulo">📅 Evolução do patrimônio</h2>
 
-    <!-- EVOLUÇÃO -->
-
-    <h2 class="secao-titulo">
-        📅 Evolução do patrimônio
-    </h2>
-
-    <div class="resultado overflow-hidden">
-
+    <div class="resultado overflow-hidden mb-6">
         <div class="overflow-x-auto">
-
             <table class="tabela">
-
                 <thead>
                     <tr>
                         <th>Período</th>
@@ -382,29 +308,37 @@ input, select, button { font-size: 16px; }
                         <th>Patrimônio</th>
                     </tr>
                 </thead>
-
                 <tbody id="historico"></tbody>
-
             </table>
-
         </div>
+    </div>
+
+    <!-- BOTÕES DE AÇÃO -->
+
+    <div class="space-y-3 mb-6">
+
+        <button onclick="salvarSimulacao()"
+        class="botao w-full bg-emerald-500 text-slate-950">
+            💾 SALVAR SIMULAÇÃO
+        </button>
+
+        <button onclick="baixarPDF()"
+        class="botao w-full bg-sky-500 text-slate-950">
+            📄 BAIXAR RELATÓRIO PDF
+        </button>
 
     </div>
 
+    <div class="bg-slate-800 rounded-xl p-4 mb-5">
 
-    <div class="bg-slate-800 rounded-xl p-4 mt-5">
-
-        <h3 class="font-bold text-sm mb-2">
-            ℹ️ Sobre esta simulação
-        </h3>
+        <h3 class="font-bold text-sm mb-2">ℹ️ Sobre esta simulação</h3>
 
         <p class="text-xs text-slate-400 leading-relaxed">
-            Os valores são estimativas matemáticas. Foram
-            considerados aportes no final de cada mês,
-            taxas constantes e ausência de inflação.
-            O IR é estimado por aporte e prazo de aplicação.
-            Não foram incluídas taxas de custódia, administração,
-            spread, IOF ou outras despesas.
+            Valores estimados, com aportes no final de cada mês
+            e taxas constantes. O IR é aproximado por aporte.
+            Não foram considerados inflação, IOF, custódia,
+            administração ou outras despesas.
+            A poupança utiliza uma premissa ilustrativa de 6% ao ano.
         </p>
 
     </div>
@@ -412,18 +346,36 @@ input, select, button { font-size: 16px; }
 </section>
 
 
-<!-- RODAPÉ -->
+<!-- HISTÓRICO -->
+
+<section class="mt-5 mb-5">
+
+    <button onclick="mostrarHistorico()"
+    class="botao w-full bg-slate-700 text-white">
+        📂 MINHAS SIMULAÇÕES SALVAS
+    </button>
+
+</section>
+
+<section id="areaHistorico" class="hidden mt-6">
+
+    <h2 class="text-xl font-bold mb-4">📚 Histórico de simulações</h2>
+
+    <div id="listaHistorico" class="space-y-3"></div>
+
+    <button onclick="apagarHistorico()"
+    class="botao w-full bg-red-900 text-white mt-4">
+        🗑️ APAGAR TODO O HISTÓRICO
+    </button>
+
+</section>
+
 
 <footer class="text-center mt-10 pb-5">
-
-    <p class="text-slate-500 text-xs">
-        Calculadora Financeira
-    </p>
-
+    <p class="text-slate-500 text-xs">Calculadora Financeira</p>
     <p class="text-slate-600 text-xs mt-1">
         Planeje hoje. Construa seu futuro.
     </p>
-
 </footer>
 
 </div>
@@ -431,11 +383,16 @@ input, select, button { font-size: 16px; }
 
 <script>
 
+let ultimaSimulacao = null;
+
+const CHAVE_HISTORICO = "calculadora_financeira_historico";
+
+
 // FORMATAÇÃO
 
 function moeda(valor) {
 
-    return valor.toLocaleString("pt-BR", {
+    return Number(valor).toLocaleString("pt-BR", {
         style: "currency",
         currency: "BRL"
     });
@@ -444,7 +401,7 @@ function moeda(valor) {
 
 function porcentagem(valor) {
 
-    return valor.toLocaleString("pt-BR", {
+    return Number(valor).toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 4
     }) + "%";
@@ -467,7 +424,7 @@ function aliquotaIR(meses) {
 }
 
 
-// DEFINIÇÃO DOS INVESTIMENTOS
+// INVESTIMENTOS
 
 function obterInvestimentos(cdi) {
 
@@ -520,15 +477,12 @@ function obterInvestimentos(cdi) {
 }
 
 
-// SIMULAÇÃO DE CADA INVESTIMENTO
+// SIMULAÇÃO
 
 function simular(inicial, aporte, meses, taxaAnual, temIR) {
 
     const taxaMensal =
         Math.pow(1 + taxaAnual / 100, 1 / 12) - 1;
-
-    // Cada aplicação é calculada separadamente.
-    // Isso permite estimar o IR conforme o prazo de cada aporte.
 
     let aplicacoes = [];
 
@@ -541,21 +495,14 @@ function simular(inicial, aporte, meses, taxaAnual, temIR) {
     }
 
     let historico = [];
-
     let totalInvestido = inicial;
 
     for (let mes = 1; mes <= meses; mes++) {
 
-        // Rendimento das aplicações anteriores
-
         aplicacoes.forEach(aplicacao => {
-
             aplicacao.saldo *= (1 + taxaMensal);
             aplicacao.idade++;
-
         });
-
-        // Novo aporte no final do mês
 
         if (aporte > 0) {
 
@@ -569,18 +516,15 @@ function simular(inicial, aporte, meses, taxaAnual, temIR) {
 
         }
 
-        // Registro anual ou final
-
         if (mes % 12 === 0 || mes === meses) {
 
-            let patrimonioBruto = 0;
-
-            aplicacoes.forEach(aplicacao => {
-                patrimonioBruto += aplicacao.saldo;
-            });
+            const patrimonioBruto = aplicacoes.reduce(
+                (total, aplicacao) => total + aplicacao.saldo,
+                0
+            );
 
             historico.push({
-                mes: mes,
+                mes,
                 investido: totalInvestido,
                 bruto: patrimonioBruto
             });
@@ -589,8 +533,6 @@ function simular(inicial, aporte, meses, taxaAnual, temIR) {
 
     }
 
-    // Cálculo dos impostos
-
     let patrimonioBruto = 0;
     let impostoTotal = 0;
 
@@ -598,21 +540,18 @@ function simular(inicial, aporte, meses, taxaAnual, temIR) {
 
         patrimonioBruto += aplicacao.saldo;
 
-        const rendimento =
-            Math.max(0, aplicacao.saldo - aplicacao.investido);
+        const rendimento = Math.max(
+            0,
+            aplicacao.saldo - aplicacao.investido
+        );
 
         if (temIR) {
-
-            const aliquota = aliquotaIR(aplicacao.idade);
-
-            impostoTotal += rendimento * aliquota;
-
+            impostoTotal += rendimento * aliquotaIR(aplicacao.idade);
         }
 
     });
 
-    const patrimonioLiquido =
-        patrimonioBruto - impostoTotal;
+    const patrimonioLiquido = patrimonioBruto - impostoTotal;
 
     return {
 
@@ -622,9 +561,21 @@ function simular(inicial, aporte, meses, taxaAnual, temIR) {
         liquido: patrimonioLiquido,
         juros: patrimonioLiquido - totalInvestido,
         taxaMensal: taxaMensal * 100,
-        historico: historico
+        historico
 
     };
+
+}
+
+
+// MENSAGEM
+
+function mostrarErro(texto) {
+
+    const mensagem = document.getElementById("mensagem");
+
+    mensagem.textContent = texto;
+    mensagem.className = "erro text-sm mt-4 text-center";
 
 }
 
@@ -643,70 +594,42 @@ function calcularTudo() {
     const cdi = Number(cdiInput.value);
     const periodo = Number(periodoInput.value);
 
-    const tipoPeriodo =
-        document.getElementById("tipoPeriodo").value;
-
-    const mensagem =
-        document.getElementById("mensagem");
-
-
-    // VALIDAÇÕES
+    const tipoPeriodo = document.getElementById("tipoPeriodo").value;
 
     if (
-        inicialInput.value.trim() === "" ||
-        aporteInput.value.trim() === "" ||
-        cdiInput.value.trim() === "" ||
-        periodoInput.value.trim() === ""
+        !inicialInput.value.trim() ||
+        !aporteInput.value.trim() ||
+        !cdiInput.value.trim() ||
+        !periodoInput.value.trim()
     ) {
-
         mostrarErro("Preencha todos os campos.");
         return;
-
     }
 
     if (
-        !Number.isFinite(inicial) ||
-        !Number.isFinite(aporte) ||
-        !Number.isFinite(cdi) ||
-        !Number.isFinite(periodo) ||
-        inicial < 0 ||
-        aporte < 0 ||
-        cdi < 0 ||
-        periodo <= 0
+        ![inicial, aporte, cdi, periodo].every(Number.isFinite) ||
+        inicial < 0 || aporte < 0 || cdi < 0 || periodo <= 0
     ) {
-
         mostrarErro("Informe valores válidos e não negativos.");
         return;
-
     }
 
     if (!Number.isInteger(periodo)) {
-
         mostrarErro("Informe um período inteiro.");
         return;
-
     }
 
-    const meses = tipoPeriodo === "anos"
-        ? periodo * 12
-        : periodo;
+    const meses = tipoPeriodo === "anos" ? periodo * 12 : periodo;
 
     if (meses > 12000) {
-
         mostrarErro("O período máximo é de 1.000 anos.");
         return;
-
     }
 
     if (inicial === 0 && aporte === 0) {
-
-        mostrarErro("Informe um valor inicial ou aporte mensal maior que zero.");
+        mostrarErro("Informe um valor inicial ou aporte maior que zero.");
         return;
-
     }
-
-
-    // INVESTIMENTOS
 
     const investimentos = obterInvestimentos(cdi);
 
@@ -720,29 +643,40 @@ function calcularTudo() {
             investimento.imposto
         );
 
-        return {
-            ...investimento,
-            ...resultado
-        };
+        return { ...investimento, ...resultado };
 
     });
-
-
-    // ORDENAÇÃO PELO VALOR LÍQUIDO
 
     resultados.sort((a, b) => b.liquido - a.liquido);
 
     const melhor = resultados[0];
 
+    ultimaSimulacao = {
 
-    // DESTAQUE DO MELHOR RESULTADO
+        data: new Date().toISOString(),
+        inicial,
+        aporte,
+        cdi,
+        meses,
+        melhorNome: melhor.nome,
 
-    document.getElementById("nomeMelhor").textContent =
-        melhor.nome;
+        resultados: resultados.map(item => ({
 
-    document.getElementById("valorMelhor").textContent =
-        moeda(melhor.liquido);
+            nome: item.nome,
+            descricao: item.descricao,
+            taxa: item.taxa,
+            investido: item.investido,
+            bruto: item.bruto,
+            imposto: item.imposto,
+            liquido: item.liquido,
+            juros: item.juros
 
+        }))
+
+    };
+
+    document.getElementById("nomeMelhor").textContent = melhor.nome;
+    document.getElementById("valorMelhor").textContent = moeda(melhor.liquido);
 
     // CARDS
 
@@ -750,9 +684,8 @@ function calcularTudo() {
 
     resultados.forEach((item, indice) => {
 
-        const percentual =
-            melhor.liquido > 0
-            ? (item.liquido / melhor.liquido) * 100
+        const percentual = melhor.liquido > 0
+            ? item.liquido / melhor.liquido * 100
             : 0;
 
         cards += `
@@ -762,18 +695,15 @@ function calcularTudo() {
                 <div class="flex justify-between items-start gap-2">
 
                     <div>
-                        <h3 class="font-bold text-base">
-                            ${item.nome}
-                        </h3>
-
+                        <h3 class="font-bold text-base">${item.nome}</h3>
                         <p class="text-xs text-slate-400 mt-1">
                             ${item.descricao}
                         </p>
                     </div>
 
                     ${indice === 0
-                    ? '<span class="tag">MELHOR RESULTADO</span>'
-                    : ''}
+                        ? '<span class="tag">MELHOR RESULTADO</span>'
+                        : ''}
 
                 </div>
 
@@ -786,23 +716,13 @@ function calcularTudo() {
                 </p>
 
                 <div class="flex justify-between mt-3 text-xs">
-                    <span class="text-slate-400">
-                        Rendimento líquido
-                    </span>
-
-                    <span class="verde font-bold">
-                        ${moeda(item.juros)}
-                    </span>
+                    <span class="text-slate-400">Rendimento líquido</span>
+                    <span class="verde font-bold">${moeda(item.juros)}</span>
                 </div>
 
                 <div class="flex justify-between mt-2 text-xs">
-                    <span class="text-slate-400">
-                        Imposto estimado
-                    </span>
-
-                    <span class="text-white">
-                        ${moeda(item.imposto)}
-                    </span>
+                    <span class="text-slate-400">Imposto estimado</span>
+                    <span>${moeda(item.imposto)}</span>
                 </div>
 
                 <div class="barra mt-4">
@@ -815,17 +735,12 @@ function calcularTudo() {
 
     });
 
-    document.getElementById("cardsInvestimentos").innerHTML =
-        cards;
+    document.getElementById("cardsInvestimentos").innerHTML = cards;
 
+    // TABELA
 
-    // TABELA COMPARATIVA
-
-    let tabela = "";
-
-    resultados.forEach(item => {
-
-        tabela += `
+    document.getElementById("tabelaComparacao").innerHTML =
+        resultados.map(item => `
 
             <tr>
                 <td class="font-bold">${item.nome}</td>
@@ -834,148 +749,469 @@ function calcularTudo() {
                 <td class="verde font-bold">${moeda(item.liquido)}</td>
             </tr>
 
-        `;
+        `).join("");
 
-    });
-
-    document.getElementById("tabelaComparacao").innerHTML =
-        tabela;
-
-
-    // GRÁFICO VISUAL
-
-    let grafico = "";
-
-    resultados.forEach(item => {
-
-        const percentual =
-            melhor.liquido > 0
-            ? (item.liquido / melhor.liquido) * 100
-            : 0;
-
-        grafico += `
-
-            <div class="mb-5">
-
-                <div class="flex justify-between gap-2 mb-2">
-
-                    <span class="text-sm font-bold">
-                        ${item.nome}
-                    </span>
-
-                    <span class="text-xs azul">
-                        ${moeda(item.liquido)}
-                    </span>
-
-                </div>
-
-                <div class="barra">
-                    <div style="width:${percentual}%"></div>
-                </div>
-
-            </div>
-
-        `;
-
-    });
+    // GRÁFICO
 
     document.getElementById("grafico").innerHTML =
-        grafico;
+        resultados.map(item => {
 
+            const percentual = melhor.liquido > 0
+                ? item.liquido / melhor.liquido * 100
+                : 0;
 
-    // RESULTADO INDIVIDUAL DO CDB 100% CDI
+            return `
+
+                <div class="mb-5">
+
+                    <div class="flex justify-between gap-2 mb-2">
+                        <span class="text-sm font-bold">${item.nome}</span>
+                        <span class="text-xs azul">${moeda(item.liquido)}</span>
+                    </div>
+
+                    <div class="barra">
+                        <div style="width:${percentual}%"></div>
+                    </div>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+    // RESULTADO BASE: CDB 100% CDI
 
     const base = resultados.find(
         item => item.nome === "CDB 100% CDI"
     );
 
-    document.getElementById("investido").textContent =
-        moeda(base.investido);
-
-    document.getElementById("juros").textContent =
-        moeda(base.juros);
-
+    document.getElementById("investido").textContent = moeda(base.investido);
+    document.getElementById("juros").textContent = moeda(base.juros);
     document.getElementById("taxaEquivalente").textContent =
         porcentagem(base.taxaMensal);
 
     document.getElementById("tempoTotal").textContent =
         meses + (meses === 1 ? " mês" : " meses");
 
+    // HISTÓRICO ANUAL
 
-    // HISTÓRICO DO CDB 100% CDI
+    document.getElementById("historico").innerHTML =
+        base.historico.map(item => {
 
-    let historico = "";
+            const rendimento = item.bruto - item.investido;
 
-    base.historico.forEach(item => {
+            const texto = item.mes % 12 === 0
+                ? "Ano " + (item.mes / 12)
+                : "Mês " + item.mes;
 
-        const rendimento =
-            item.bruto - item.investido;
+            return `
 
-        const texto =
-            item.mes % 12 === 0
-            ? "Ano " + (item.mes / 12)
-            : "Mês " + item.mes;
+                <tr>
+                    <td>${texto}</td>
+                    <td>${moeda(item.investido)}</td>
+                    <td class="verde">${moeda(rendimento)}</td>
+                    <td class="azul font-bold">${moeda(item.bruto)}</td>
+                </tr>
 
-        historico += `
+            `;
 
-            <tr>
-                <td>${texto}</td>
+        }).join("");
 
-                <td>${moeda(item.investido)}</td>
+    document.getElementById("areaComparacao").classList.remove("hidden");
 
-                <td class="verde">
-                    ${moeda(rendimento)}
-                </td>
+    const mensagem = document.getElementById("mensagem");
 
-                <td class="azul font-bold">
-                    ${moeda(item.bruto)}
-                </td>
-            </tr>
+    mensagem.textContent = "Comparação realizada com sucesso!";
+    mensagem.className = "verde text-sm mt-4 text-center";
 
-        `;
+    document.getElementById("areaComparacao").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+}
+
+
+// HISTÓRICO LOCAL
+
+function lerHistorico() {
+
+    try {
+
+        const dados = localStorage.getItem("calculadora_financeira_historico");
+
+        if (!dados) return [];
+
+        const lista = JSON.parse(dados);
+
+        return Array.isArray(lista) ? lista : [];
+
+    } catch (erro) {
+
+        return [];
+
+    }
+
+}
+
+
+// SALVAR SIMULAÇÃO
+
+function salvarSimulacao() {
+
+    if (!ultimaSimulacao) {
+        alert("Primeiro realize uma simulação.");
+        return;
+    }
+
+    const historico = lerHistorico();
+
+    const registro = {
+        ...ultimaSimulacao,
+        id: Date.now()
+    };
+
+    try {
+
+        historico.unshift(registro);
+
+        localStorage.setItem(
+            "calculadora_financeira_historico",
+            JSON.stringify(historico)
+        );
+
+        alert("Simulação salva com sucesso!");
+
+        mostrarHistorico();
+
+    } catch (erro) {
+
+        alert("Não foi possível salvar. Verifique o espaço disponível.");
+
+    }
+
+}
+
+
+// MOSTRAR HISTÓRICO
+
+function mostrarHistorico() {
+
+    const historico = lerHistorico();
+
+    const area = document.getElementById("areaHistorico");
+    const lista = document.getElementById("listaHistorico");
+
+    area.classList.remove("hidden");
+    lista.innerHTML = "";
+
+    if (historico.length === 0) {
+
+        lista.textContent = "Nenhuma simulação salva ainda.";
+
+        area.scrollIntoView({ behavior: "smooth" });
+
+        return;
+
+    }
+
+    historico.forEach(registro => {
+
+        const card = document.createElement("div");
+        card.className = "resultado";
+
+        const data = new Date(registro.data);
+
+        const melhor = registro.resultados.find(
+            item => item.nome === registro.melhorNome
+        );
+
+        const titulo = document.createElement("h3");
+        titulo.className = "font-bold text-lg mt-2";
+        titulo.textContent = registro.melhorNome;
+
+        const dataTexto = document.createElement("p");
+        dataTexto.className = "text-xs text-slate-400";
+        dataTexto.textContent = data.toLocaleString("pt-BR");
+
+        const valor = document.createElement("p");
+        valor.className = "text-xl font-bold verde mt-2";
+        valor.textContent = moeda(melhor ? melhor.liquido : 0);
+
+        const detalhes = document.createElement("p");
+        detalhes.className = "text-xs text-slate-400 mt-2";
+        detalhes.textContent =
+            "Inicial: " + moeda(registro.inicial) +
+            " | Aporte: " + moeda(registro.aporte) +
+            " | Prazo: " + registro.meses + " meses";
+
+        const botoes = document.createElement("div");
+        botoes.className = "grid grid-cols-2 gap-2 mt-4";
+
+        const pdf = document.createElement("button");
+        pdf.className = "botao bg-sky-600 text-white";
+        pdf.textContent = "📄 Baixar PDF";
+        pdf.onclick = () => baixarPDF(registro.id);
+
+        const excluir = document.createElement("button");
+        excluir.className = "botao bg-red-900 text-white";
+        excluir.textContent = "🗑️ Excluir";
+        excluir.onclick = () => excluirSimulacao(registro.id);
+
+        botoes.append(pdf, excluir);
+
+        card.append(dataTexto, titulo, valor, detalhes, botoes);
+        lista.appendChild(card);
 
     });
 
-    document.getElementById("historico").innerHTML =
-        historico;
-
-
-    // EXIBIÇÃO
-
-    document.getElementById("areaComparacao")
-        .classList.remove("hidden");
-
-    mensagem.textContent =
-        "Comparação realizada com sucesso!";
-
-    mensagem.className =
-        "verde text-sm mt-4 text-center";
-
-    document.getElementById("areaComparacao")
-        .scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
+    area.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
 
 }
 
 
-// MENSAGEM DE ERRO
+// EXCLUIR SIMULAÇÃO
 
-function mostrarErro(texto) {
+function excluirSimulacao(id) {
 
-    const mensagem =
-        document.getElementById("mensagem");
+    if (!confirm("Deseja excluir esta simulação?")) return;
 
-    mensagem.textContent = texto;
+    const historico = lerHistorico().filter(
+        item => item.id !== id
+    );
 
-    mensagem.className =
-        "erro text-sm mt-4 text-center";
+    localStorage.setItem(
+        "calculadora_financeira_historico",
+        JSON.stringify(historico)
+    );
+
+    mostrarHistorico();
 
 }
 
 
-// LIMPAR
+// APAGAR HISTÓRICO
+
+function apagarHistorico() {
+
+    if (!confirm("Deseja apagar todas as simulações salvas?")) return;
+
+    localStorage.removeItem("calculadora_financeira_historico");
+
+    mostrarHistorico();
+
+}
+
+
+// PDF
+
+function escaparHTML(valor) {
+
+    return String(valor).replace(/[&<>"']/g, caractere => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[caractere]);
+
+}
+
+
+function baixarPDF(id) {
+
+    let registro = ultimaSimulacao;
+
+    if (id !== undefined) {
+
+        registro = lerHistorico().find(
+            item => item.id === id
+        );
+
+    }
+
+    if (!registro) {
+        alert("Nenhuma simulação disponível.");
+        return;
+    }
+
+    const melhor = registro.resultados.find(
+        item => item.nome === registro.melhorNome
+    );
+
+    const linhas = registro.resultados.map(item => `
+
+        <tr>
+            <td>${escaparHTML(item.nome)}</td>
+            <td>${moeda(item.bruto)}</td>
+            <td>${moeda(item.imposto)}</td>
+            <td>${moeda(item.liquido)}</td>
+        </tr>
+
+    `).join("");
+
+    const janela = window.open("", "_blank");
+
+    if (!janela) {
+
+        alert("Permita pop-ups no navegador para gerar o PDF.");
+
+        return;
+
+    }
+
+    janela.document.write(`
+
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+
+        <head>
+
+            <meta charset="UTF-8">
+
+            <title>Relatório Financeiro</title>
+
+            <style>
+
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 30px;
+                    color: #1e293b;
+                }
+
+                h1 { color: #0369a1; }
+
+                .resumo {
+                    background: #e0f2fe;
+                    padding: 18px;
+                    border-radius: 10px;
+                    margin: 20px 0;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+
+                th, td {
+                    border-bottom: 1px solid #cbd5e1;
+                    padding: 10px 5px;
+                    text-align: right;
+                    font-size: 12px;
+                }
+
+                th:first-child, td:first-child {
+                    text-align: left;
+                }
+
+                th { background: #f1f5f9; }
+
+                .verde {
+                    color: #15803d;
+                    font-weight: bold;
+                }
+
+                .rodape {
+                    margin-top: 30px;
+                    font-size: 11px;
+                    color: #64748b;
+                    line-height: 1.5;
+                }
+
+            </style>
+
+        </head>
+
+        <body>
+
+            <h1>📈 Calculadora Financeira</h1>
+
+            <p>Relatório de comparação de investimentos</p>
+
+            <p>
+                Data:
+                ${new Date(registro.data).toLocaleString("pt-BR")}
+            </p>
+
+            <div class="resumo">
+
+                <h2>Melhor resultado estimado</h2>
+
+                <h3>${escaparHTML(registro.melhorNome)}</h3>
+
+                <h2 class="verde">
+                    ${moeda(melhor ? melhor.liquido : 0)}
+                </h2>
+
+            </div>
+
+            <h3>Dados da simulação</h3>
+
+            <p>Valor inicial: ${moeda(registro.inicial)}</p>
+
+            <p>Aporte mensal: ${moeda(registro.aporte)}</p>
+
+            <p>CDI de referência: ${registro.cdi}% ao ano</p>
+
+            <p>Período: ${registro.meses} meses</p>
+
+            <h3>Comparação de investimentos</h3>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Investimento</th>
+                        <th>Bruto</th>
+                        <th>Imposto</th>
+                        <th>Líquido</th>
+                    </tr>
+                </thead>
+
+                <tbody>${linhas}</tbody>
+
+            </table>
+
+            <div class="rodape">
+
+                <p>
+                    Relatório de simulação matemática.
+                    Não constitui recomendação de investimento.
+                </p>
+
+                <p>
+                    Taxas, impostos e custos podem variar.
+                    Os valores são estimativas e não representam
+                    ofertas reais de instituições financeiras.
+                </p>
+
+            </div>
+
+            <script>
+
+                window.onload = function() {
+                    setTimeout(function() {
+                        window.print();
+                    }, 500);
+                };
+
+            <\/script>
+
+        </body>
+        </html>
+
+    `);
+
+    janela.document.close();
+
+}
+
+
+// LIMPAR CAMPOS
 
 function limpar() {
 
@@ -983,20 +1219,31 @@ function limpar() {
     document.getElementById("aporte").value = "";
     document.getElementById("cdi").value = "10";
     document.getElementById("periodo").value = "";
-
     document.getElementById("tipoPeriodo").value = "anos";
 
     document.getElementById("mensagem").textContent = "";
 
-    document.getElementById("areaComparacao")
-        .classList.add("hidden");
+    document.getElementById("areaComparacao").classList.add("hidden");
 
-    document.getElementById("cardsInvestimentos").innerHTML = "";
-    document.getElementById("tabelaComparacao").innerHTML = "";
-    document.getElementById("historico").innerHTML = "";
-    document.getElementById("grafico").innerHTML = "";
+    ultimaSimulacao = null;
 
     document.getElementById("inicial").focus();
+
+}
+
+
+// SERVICE WORKER
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", () => {
+
+        navigator.serviceWorker.register("./sw.js")
+            .catch(erro => {
+                console.error("Erro no Service Worker:", erro);
+            });
+
+    });
 
 }
 
