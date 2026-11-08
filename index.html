@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -11,9 +10,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
@@ -22,9 +19,7 @@ body {
     font-family: Arial, sans-serif;
 }
 
-input, select, button {
-    font-size: 16px;
-}
+input, select, button { font-size: 16px; }
 
 .campo {
     width: 100%;
@@ -36,32 +31,54 @@ input, select, button {
     outline: none;
 }
 
-.campo:focus {
-    border-color: #38bdf8;
-}
+.campo:focus { border-color: #38bdf8; }
 
 .botao {
-    min-height: 52px;
+    min-height: 50px;
     border-radius: 12px;
     font-weight: bold;
-    transition: 0.2s;
+    transition: .2s;
 }
 
 .resultado {
     background: #1e293b;
     border: 1px solid #334155;
     border-radius: 14px;
-    padding: 17px;
+    padding: 16px;
+}
+
+.investimento {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 16px;
+}
+
+.investimento.melhor {
+    border: 2px solid #4ade80;
+}
+
+.barra {
+    height: 10px;
+    background: #334155;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.barra div {
+    height: 100%;
+    border-radius: 20px;
+    background: #38bdf8;
 }
 
 .tabela {
     width: 100%;
     border-collapse: collapse;
-    min-width: 420px;
+    min-width: 520px;
 }
 
 .tabela th, .tabela td {
-    padding: 13px 10px;
+    padding: 12px 9px;
     text-align: right;
     border-bottom: 1px solid #334155;
     white-space: nowrap;
@@ -74,25 +91,34 @@ input, select, button {
 
 .tabela th {
     color: #94a3b8;
-    font-size: 12px;
+    font-size: 11px;
 }
 
-.tabela td {
-    font-size: 13px;
+.tabela td { font-size: 12px; }
+
+.verde { color: #4ade80; }
+.azul { color: #38bdf8; }
+.erro { color: #f87171; }
+
+.secao-titulo {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 15px;
 }
 
-.verde {
-    color: #4ade80;
+.tag {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: #064e3b;
+    color: #86efac;
+    font-size: 11px;
+    font-weight: bold;
 }
 
-.azul {
-    color: #38bdf8;
+@media(max-width:380px) {
+    .tabela { min-width: 480px; }
 }
-
-.erro {
-    color: #f87171;
-}
-
 </style>
 </head>
 
@@ -100,353 +126,312 @@ input, select, button {
 
 <div class="max-w-xl mx-auto px-4 py-6">
 
-    <!-- CABEÇALHO -->
+<!-- CABEÇALHO -->
 
-    <header class="mb-7">
+<header class="mb-7">
 
-        <div class="flex items-center gap-3 mb-3">
+    <div class="flex items-center gap-3 mb-3">
 
-            <div class="bg-sky-500 rounded-xl p-3">
-                <span class="text-2xl">📈</span>
-            </div>
-
-            <div>
-                <h1 class="text-xl font-bold">
-                    Calculadora Financeira
-                </h1>
-
-                <p class="text-slate-400 text-sm">
-                    Juros compostos e metas financeiras
-                </p>
-            </div>
-
+        <div class="bg-sky-500 rounded-xl p-3">
+            <span class="text-2xl">📈</span>
         </div>
 
-        <p class="text-slate-400 text-sm leading-relaxed">
-            Descubra quanto seu dinheiro pode render
-            ao longo do tempo com juros compostos.
+        <div>
+            <h1 class="text-xl font-bold">
+                Calculadora Financeira
+            </h1>
+
+            <p class="text-slate-400 text-sm">
+                Simule, compare e planeje seus investimentos
+            </p>
+        </div>
+
+    </div>
+
+    <p class="text-slate-400 text-sm leading-relaxed">
+        Descubra o potencial dos juros compostos e compare
+        diferentes modalidades de investimento.
+    </p>
+
+</header>
+
+
+<!-- DADOS DO INVESTIMENTO -->
+
+<section class="bg-slate-800 rounded-2xl p-5 mb-5">
+
+    <h2 class="secao-titulo">
+        💰 Dados do investimento
+    </h2>
+
+    <div class="mb-4">
+        <label class="block text-sm text-slate-300 mb-2">
+            Valor inicial (R$)
+        </label>
+
+        <input id="inicial" class="campo"
+        type="number" min="0" step="0.01" value="1000">
+    </div>
+
+    <div class="mb-4">
+        <label class="block text-sm text-slate-300 mb-2">
+            Aporte mensal (R$)
+        </label>
+
+        <input id="aporte" class="campo"
+        type="number" min="0" step="0.01" value="200">
+    </div>
+
+    <div class="mb-4">
+        <label class="block text-sm text-slate-300 mb-2">
+            CDI anual de referência (%)
+        </label>
+
+        <input id="cdi" class="campo"
+        type="number" min="0" step="0.01" value="10">
+
+        <p class="text-xs text-slate-400 mt-2">
+            Altere conforme a taxa CDI que deseja utilizar na simulação.
+        </p>
+    </div>
+
+    <div class="mb-4">
+        <label class="block text-sm text-slate-300 mb-2">
+            Período do investimento
+        </label>
+
+        <div class="flex gap-2">
+
+            <input id="periodo" class="campo flex-1 min-w-0"
+            type="number" min="1" step="1" value="10">
+
+            <select id="tipoPeriodo" class="campo" style="width:120px">
+                <option value="anos">Anos</option>
+                <option value="meses">Meses</option>
+            </select>
+
+        </div>
+    </div>
+
+    <button onclick="calcularTudo()"
+    class="botao w-full bg-sky-500 hover:bg-sky-400 text-slate-950 mb-3">
+        📊 CALCULAR E COMPARAR
+    </button>
+
+    <button onclick="limpar()"
+    class="botao w-full bg-slate-700 hover:bg-slate-600 text-white">
+        LIMPAR CAMPOS
+    </button>
+
+    <p id="mensagem" class="text-sm mt-4 text-center"></p>
+
+</section>
+
+
+<!-- COMPARADOR -->
+
+<section id="areaComparacao" class="hidden">
+
+    <h2 class="secao-titulo">
+        🏆 Comparador de investimentos
+    </h2>
+
+    <p class="text-sm text-slate-400 mb-4">
+        Veja quanto seu dinheiro poderá acumular em cada modalidade.
+    </p>
+
+    <div id="melhorInvestimento"
+    class="bg-emerald-950 border border-emerald-800 rounded-2xl p-5 mb-4">
+
+        <p class="text-emerald-300 text-sm mb-2">
+            Melhor resultado estimado
         </p>
 
-    </header>
-
-
-    <!-- FORMULÁRIO -->
-
-    <section class="bg-slate-800 rounded-2xl p-5 mb-5">
-
-        <h2 class="text-lg font-bold mb-5">
-            💰 Dados do investimento
+        <h2 id="nomeMelhor" class="text-xl font-bold">
+            -
         </h2>
 
-        <!-- VALOR INICIAL -->
+        <p id="valorMelhor"
+        class="text-2xl font-bold text-white mt-2">
+            R$ 0,00
+        </p>
 
-        <div class="mb-4">
+        <p class="text-emerald-300 text-xs mt-2">
+            Patrimônio líquido estimado
+        </p>
 
-            <label class="block text-sm text-slate-300 mb-2">
-                Valor inicial (R$)
-            </label>
+    </div>
 
-            <input
-                id="inicial"
-                class="campo"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="Ex: 1000"
-                value="1000"
-            >
+
+    <!-- CARDS -->
+
+    <div id="cardsInvestimentos" class="grid grid-cols-1 gap-3 mb-6">
+    </div>
+
+
+    <!-- TABELA COMPARATIVA -->
+
+    <h2 class="secao-titulo">
+        📋 Comparação detalhada
+    </h2>
+
+    <div class="resultado overflow-hidden mb-6">
+
+        <div class="overflow-x-auto">
+
+            <table class="tabela">
+
+                <thead>
+                    <tr>
+                        <th>Investimento</th>
+                        <th>Bruto</th>
+                        <th>Imposto</th>
+                        <th>Líquido</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tabelaComparacao"></tbody>
+
+            </table>
 
         </div>
 
-
-        <!-- APORTE MENSAL -->
-
-        <div class="mb-4">
-
-            <label class="block text-sm text-slate-300 mb-2">
-                Aporte mensal (R$)
-            </label>
-
-            <input
-                id="aporte"
-                class="campo"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="Ex: 200"
-                value="200"
-            >
-
-        </div>
+    </div>
 
 
-        <!-- TAXA DE JUROS -->
+    <!-- GRÁFICO SIMPLES -->
 
-        <div class="mb-4">
+    <h2 class="secao-titulo">
+        📊 Comparação visual
+    </h2>
 
-            <label class="block text-sm text-slate-300 mb-2">
-                Taxa de juros (%)
-            </label>
+    <div id="grafico" class="resultado mb-6">
+    </div>
 
-            <div class="flex gap-2">
 
-                <input
-                    id="taxa"
-                    class="campo flex-1 min-w-0"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="Ex: 1"
-                    value="1"
-                >
+    <!-- CALCULADORA INDIVIDUAL -->
 
-                <select
-                    id="tipoTaxa"
-                    class="campo"
-                    style="width:125px"
-                >
+    <h2 class="secao-titulo">
+        💵 Simulação de juros compostos
+    </h2>
 
-                    <option value="mensal">
-                        Ao mês
-                    </option>
+    <div class="grid grid-cols-2 gap-3 mb-3">
 
-                    <option value="anual">
-                        Ao ano
-                    </option>
-
-                </select>
-
-            </div>
-
-            <p class="text-xs text-slate-400 mt-2">
-                Informe a taxa de rendimento do investimento.
+        <div class="resultado">
+            <p class="text-xs text-slate-400 mb-2">
+                Total investido
             </p>
 
-            <!-- NOVO BOTÃO DE PESQUISA -->
-
-            <button
-                type="button"
-                onclick="pesquisarMelhoresJuros()"
-                class="botao w-full mt-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950"
-            >
-                🔎 PESQUISAR MELHORES JUROS
-            </button>
-
-        </div>
-
-
-        <!-- PERÍODO -->
-
-        <div class="mb-5">
-
-            <label class="block text-sm text-slate-300 mb-2">
-                Período do investimento
-            </label>
-
-            <div class="flex gap-2">
-
-                <input
-                    id="periodo"
-                    class="campo flex-1 min-w-0"
-                    type="number"
-                    min="1"
-                    step="1"
-                    placeholder="Ex: 10"
-                    value="10"
-                >
-
-                <select
-                    id="tipoPeriodo"
-                    class="campo"
-                    style="width:125px"
-                >
-
-                    <option value="anos">
-                        Anos
-                    </option>
-
-                    <option value="meses">
-                        Meses
-                    </option>
-
-                </select>
-
-            </div>
-
-        </div>
-
-
-        <!-- BOTÕES -->
-
-        <button
-            onclick="calcular()"
-            class="botao w-full bg-sky-500 hover:bg-sky-400 text-slate-950 mb-3"
-        >
-            CALCULAR CRESCIMENTO
-        </button>
-
-        <button
-            onclick="limpar()"
-            class="botao w-full bg-slate-700 hover:bg-slate-600 text-white"
-        >
-            LIMPAR CAMPOS
-        </button>
-
-        <p id="mensagem" class="text-sm mt-4 text-center"></p>
-
-    </section>
-
-
-    <!-- RESULTADOS -->
-
-    <section id="areaResultados" class="hidden">
-
-        <h2 class="text-lg font-bold mb-4">
-            📊 Resultado da simulação
-        </h2>
-
-        <!-- TOTAL ACUMULADO -->
-
-        <div class="bg-sky-950 border border-sky-800 rounded-2xl p-5 mb-3">
-
-            <p class="text-sky-300 text-sm mb-2">
-                Patrimônio total acumulado
-            </p>
-
-            <h2
-                id="total"
-                class="text-3xl font-bold text-white break-words"
-            >
+            <h3 id="investido"
+            class="text-lg font-bold">
                 R$ 0,00
-            </h2>
-
-            <p class="text-sky-300 text-xs mt-2">
-                Valor final estimado
-            </p>
-
+            </h3>
         </div>
 
+        <div class="resultado">
+            <p class="text-xs text-slate-400 mb-2">
+                Juros ganhos
+            </p>
 
-        <!-- INVESTIDO E JUROS -->
-
-        <div class="grid grid-cols-2 gap-3 mb-3">
-
-            <div class="resultado">
-
-                <p class="text-xs text-slate-400 mb-2">
-                    Total investido
-                </p>
-
-                <h3
-                    id="investido"
-                    class="text-lg font-bold text-white break-words"
-                >
-                    R$ 0,00
-                </h3>
-
-            </div>
-
-            <div class="resultado">
-
-                <p class="text-xs text-slate-400 mb-2">
-                    Juros ganhos
-                </p>
-
-                <h3
-                    id="juros"
-                    class="text-lg font-bold verde break-words"
-                >
-                    R$ 0,00
-                </h3>
-
-            </div>
-
+            <h3 id="juros"
+            class="text-lg font-bold verde">
+                R$ 0,00
+            </h3>
         </div>
 
+    </div>
 
-        <!-- TAXA E TEMPO -->
+    <div class="resultado mb-6">
 
-        <div class="resultado mb-6">
-
-            <p class="text-sm text-slate-400">
-                Taxa mensal equivalente
-            </p>
-
-            <p id="taxaEquivalente" class="text-lg font-bold azul">
-                0%
-            </p>
-
-            <p class="text-sm text-slate-400 mt-3">
-                Tempo total da simulação
-            </p>
-
-            <p id="tempoTotal" class="text-lg font-bold">
-                0 meses
-            </p>
-
-        </div>
-
-
-        <!-- HISTÓRICO -->
-
-        <h2 class="text-lg font-bold mb-3">
-            📅 Evolução do patrimônio
-        </h2>
-
-        <div class="resultado overflow-hidden">
-
-            <div class="overflow-x-auto">
-
-                <table class="tabela">
-
-                    <thead>
-                        <tr>
-                            <th>Período</th>
-                            <th>Investido</th>
-                            <th>Rendimento</th>
-                            <th>Patrimônio</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="historico"></tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-
-        <p class="text-xs text-slate-400 mt-4 leading-relaxed">
-            Simulação matemática estimada, considerando
-            aportes no final de cada mês, taxa constante
-            e ausência de impostos, taxas administrativas
-            e inflação.
+        <p class="text-sm text-slate-400">
+            Taxa mensal equivalente do CDI
         </p>
 
-    </section>
-
-
-    <!-- RODAPÉ -->
-
-    <footer class="text-center mt-10 pb-5">
-
-        <p class="text-slate-500 text-xs">
-            Calculadora Financeira
+        <p id="taxaEquivalente" class="text-lg font-bold azul">
+            0%
         </p>
 
-        <p class="text-slate-600 text-xs mt-1">
-            Planeje hoje. Construa seu futuro.
+        <p class="text-sm text-slate-400 mt-3">
+            Tempo total
         </p>
 
-    </footer>
+        <p id="tempoTotal" class="text-lg font-bold">
+            0 meses
+        </p>
+
+    </div>
+
+
+    <!-- EVOLUÇÃO -->
+
+    <h2 class="secao-titulo">
+        📅 Evolução do patrimônio
+    </h2>
+
+    <div class="resultado overflow-hidden">
+
+        <div class="overflow-x-auto">
+
+            <table class="tabela">
+
+                <thead>
+                    <tr>
+                        <th>Período</th>
+                        <th>Investido</th>
+                        <th>Rendimento</th>
+                        <th>Patrimônio</th>
+                    </tr>
+                </thead>
+
+                <tbody id="historico"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <div class="bg-slate-800 rounded-xl p-4 mt-5">
+
+        <h3 class="font-bold text-sm mb-2">
+            ℹ️ Sobre esta simulação
+        </h3>
+
+        <p class="text-xs text-slate-400 leading-relaxed">
+            Os valores são estimativas matemáticas. Foram
+            considerados aportes no final de cada mês,
+            taxas constantes e ausência de inflação.
+            O IR é estimado por aporte e prazo de aplicação.
+            Não foram incluídas taxas de custódia, administração,
+            spread, IOF ou outras despesas.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- RODAPÉ -->
+
+<footer class="text-center mt-10 pb-5">
+
+    <p class="text-slate-500 text-xs">
+        Calculadora Financeira
+    </p>
+
+    <p class="text-slate-600 text-xs mt-1">
+        Planeje hoje. Construa seu futuro.
+    </p>
+
+</footer>
 
 </div>
 
 
 <script>
 
-// FORMATAÇÃO DE MOEDA
+// FORMATAÇÃO
 
 function moeda(valor) {
 
@@ -456,9 +441,6 @@ function moeda(valor) {
     });
 
 }
-
-
-// FORMATAÇÃO DE PORCENTAGEM
 
 function porcentagem(valor) {
 
@@ -470,55 +452,196 @@ function porcentagem(valor) {
 }
 
 
-// NOVA FUNÇÃO: PESQUISAR MELHORES JUROS
+// IMPOSTO DE RENDA ESTIMADO
 
-function pesquisarMelhoresJuros() {
+function aliquotaIR(meses) {
 
-    const pesquisa = [
-        "melhores taxas CDB Brasil hoje percentual CDI",
-        "LCI LCA melhores taxas rendimento carência",
-        "Tesouro Selic taxas atuais Tesouro Direto",
-        "Tesouro IPCA taxas atuais vencimentos",
-        "rendimento da poupança Banco Central"
+    const dias = meses * 30;
+
+    if (dias <= 180) return 0.225;
+    if (dias <= 360) return 0.20;
+    if (dias <= 720) return 0.175;
+
+    return 0.15;
+
+}
+
+
+// DEFINIÇÃO DOS INVESTIMENTOS
+
+function obterInvestimentos(cdi) {
+
+    return [
+
+        {
+            nome: "CDB 100% CDI",
+            descricao: "Rendimento de 100% do CDI",
+            taxa: cdi,
+            imposto: true
+        },
+
+        {
+            nome: "CDB 110% CDI",
+            descricao: "Rendimento de 110% do CDI",
+            taxa: cdi * 1.10,
+            imposto: true
+        },
+
+        {
+            nome: "LCI 90% CDI",
+            descricao: "Rendimento de 90% do CDI",
+            taxa: cdi * 0.90,
+            imposto: false
+        },
+
+        {
+            nome: "LCA 90% CDI",
+            descricao: "Rendimento de 90% do CDI",
+            taxa: cdi * 0.90,
+            imposto: false
+        },
+
+        {
+            nome: "Tesouro Selic",
+            descricao: "Taxa aproximada igual ao CDI",
+            taxa: cdi,
+            imposto: true
+        },
+
+        {
+            nome: "Poupança",
+            descricao: "Premissa ilustrativa de 6% ao ano",
+            taxa: 6,
+            imposto: false
+        }
+
     ];
 
-    const consulta = pesquisa.join(" ");
+}
 
-    const url =
-        "https://www.google.com/search?q=" +
-        encodeURIComponent(consulta);
 
-    window.open(
-        url,
-        "_blank",
-        "noopener,noreferrer"
-    );
+// SIMULAÇÃO DE CADA INVESTIMENTO
+
+function simular(inicial, aporte, meses, taxaAnual, temIR) {
+
+    const taxaMensal =
+        Math.pow(1 + taxaAnual / 100, 1 / 12) - 1;
+
+    // Cada aplicação é calculada separadamente.
+    // Isso permite estimar o IR conforme o prazo de cada aporte.
+
+    let aplicacoes = [];
+
+    if (inicial > 0) {
+        aplicacoes.push({
+            saldo: inicial,
+            investido: inicial,
+            idade: 0
+        });
+    }
+
+    let historico = [];
+
+    let totalInvestido = inicial;
+
+    for (let mes = 1; mes <= meses; mes++) {
+
+        // Rendimento das aplicações anteriores
+
+        aplicacoes.forEach(aplicacao => {
+
+            aplicacao.saldo *= (1 + taxaMensal);
+            aplicacao.idade++;
+
+        });
+
+        // Novo aporte no final do mês
+
+        if (aporte > 0) {
+
+            aplicacoes.push({
+                saldo: aporte,
+                investido: aporte,
+                idade: 0
+            });
+
+            totalInvestido += aporte;
+
+        }
+
+        // Registro anual ou final
+
+        if (mes % 12 === 0 || mes === meses) {
+
+            let patrimonioBruto = 0;
+
+            aplicacoes.forEach(aplicacao => {
+                patrimonioBruto += aplicacao.saldo;
+            });
+
+            historico.push({
+                mes: mes,
+                investido: totalInvestido,
+                bruto: patrimonioBruto
+            });
+
+        }
+
+    }
+
+    // Cálculo dos impostos
+
+    let patrimonioBruto = 0;
+    let impostoTotal = 0;
+
+    aplicacoes.forEach(aplicacao => {
+
+        patrimonioBruto += aplicacao.saldo;
+
+        const rendimento =
+            Math.max(0, aplicacao.saldo - aplicacao.investido);
+
+        if (temIR) {
+
+            const aliquota = aliquotaIR(aplicacao.idade);
+
+            impostoTotal += rendimento * aliquota;
+
+        }
+
+    });
+
+    const patrimonioLiquido =
+        patrimonioBruto - impostoTotal;
+
+    return {
+
+        investido: totalInvestido,
+        bruto: patrimonioBruto,
+        imposto: impostoTotal,
+        liquido: patrimonioLiquido,
+        juros: patrimonioLiquido - totalInvestido,
+        taxaMensal: taxaMensal * 100,
+        historico: historico
+
+    };
 
 }
 
 
 // CÁLCULO PRINCIPAL
 
-function calcular() {
+function calcularTudo() {
 
-    const inicial = Number(
-        document.getElementById("inicial").value
-    );
+    const inicialInput = document.getElementById("inicial");
+    const aporteInput = document.getElementById("aporte");
+    const cdiInput = document.getElementById("cdi");
+    const periodoInput = document.getElementById("periodo");
 
-    const aporte = Number(
-        document.getElementById("aporte").value
-    );
-
-    const taxa = Number(
-        document.getElementById("taxa").value
-    );
-
-    const periodo = Number(
-        document.getElementById("periodo").value
-    );
-
-    const tipoTaxa =
-        document.getElementById("tipoTaxa").value;
+    const inicial = Number(inicialInput.value);
+    const aporte = Number(aporteInput.value);
+    const cdi = Number(cdiInput.value);
+    const periodo = Number(periodoInput.value);
 
     const tipoPeriodo =
         document.getElementById("tipoPeriodo").value;
@@ -530,177 +653,305 @@ function calcular() {
     // VALIDAÇÕES
 
     if (
-        document.getElementById("inicial").value.trim() === "" ||
-        document.getElementById("aporte").value.trim() === "" ||
-        document.getElementById("taxa").value.trim() === "" ||
-        document.getElementById("periodo").value.trim() === ""
+        inicialInput.value.trim() === "" ||
+        aporteInput.value.trim() === "" ||
+        cdiInput.value.trim() === "" ||
+        periodoInput.value.trim() === ""
     ) {
 
-        mensagem.textContent =
-            "Preencha todos os campos.";
-
-        mensagem.className = "erro text-sm mt-4 text-center";
-
+        mostrarErro("Preencha todos os campos.");
         return;
-    }
 
+    }
 
     if (
         !Number.isFinite(inicial) ||
         !Number.isFinite(aporte) ||
-        !Number.isFinite(taxa) ||
+        !Number.isFinite(cdi) ||
         !Number.isFinite(periodo) ||
         inicial < 0 ||
         aporte < 0 ||
-        taxa < 0 ||
+        cdi < 0 ||
         periodo <= 0
     ) {
 
-        mensagem.textContent =
-            "Informe valores válidos e não negativos. O período deve ser maior que zero.";
-
-        mensagem.className = "erro text-sm mt-4 text-center";
-
+        mostrarErro("Informe valores válidos e não negativos.");
         return;
-    }
 
+    }
 
     if (!Number.isInteger(periodo)) {
 
-        mensagem.textContent =
-            "Informe um período inteiro em anos ou meses.";
-
-        mensagem.className = "erro text-sm mt-4 text-center";
-
+        mostrarErro("Informe um período inteiro.");
         return;
+
     }
-
-
-    // CONVERSÃO DO PERÍODO
 
     const meses = tipoPeriodo === "anos"
         ? periodo * 12
         : periodo;
 
-
     if (meses > 12000) {
 
-        mensagem.textContent =
-            "O período máximo permitido é de 1.000 anos.";
-
-        mensagem.className = "erro text-sm mt-4 text-center";
-
+        mostrarErro("O período máximo é de 1.000 anos.");
         return;
+
     }
 
+    if (inicial === 0 && aporte === 0) {
 
-    // CONVERSÃO DA TAXA
-
-    let taxaMensal;
-
-    if (tipoTaxa === "anual") {
-
-        taxaMensal =
-            Math.pow(1 + taxa / 100, 1 / 12) - 1;
-
-    } else {
-
-        taxaMensal = taxa / 100;
+        mostrarErro("Informe um valor inicial ou aporte mensal maior que zero.");
+        return;
 
     }
 
 
-    // SIMULAÇÃO MÊS A MÊS
+    // INVESTIMENTOS
 
-    let saldo = inicial;
+    const investimentos = obterInvestimentos(cdi);
 
-    let totalInvestido = inicial;
+    let resultados = investimentos.map(investimento => {
+
+        const resultado = simular(
+            inicial,
+            aporte,
+            meses,
+            investimento.taxa,
+            investimento.imposto
+        );
+
+        return {
+            ...investimento,
+            ...resultado
+        };
+
+    });
+
+
+    // ORDENAÇÃO PELO VALOR LÍQUIDO
+
+    resultados.sort((a, b) => b.liquido - a.liquido);
+
+    const melhor = resultados[0];
+
+
+    // DESTAQUE DO MELHOR RESULTADO
+
+    document.getElementById("nomeMelhor").textContent =
+        melhor.nome;
+
+    document.getElementById("valorMelhor").textContent =
+        moeda(melhor.liquido);
+
+
+    // CARDS
+
+    let cards = "";
+
+    resultados.forEach((item, indice) => {
+
+        const percentual =
+            melhor.liquido > 0
+            ? (item.liquido / melhor.liquido) * 100
+            : 0;
+
+        cards += `
+
+            <div class="investimento ${indice === 0 ? "melhor" : ""}">
+
+                <div class="flex justify-between items-start gap-2">
+
+                    <div>
+                        <h3 class="font-bold text-base">
+                            ${item.nome}
+                        </h3>
+
+                        <p class="text-xs text-slate-400 mt-1">
+                            ${item.descricao}
+                        </p>
+                    </div>
+
+                    ${indice === 0
+                    ? '<span class="tag">MELHOR RESULTADO</span>'
+                    : ''}
+
+                </div>
+
+                <p class="text-xs text-slate-400 mt-4">
+                    Patrimônio líquido
+                </p>
+
+                <p class="text-2xl font-bold azul mt-1">
+                    ${moeda(item.liquido)}
+                </p>
+
+                <div class="flex justify-between mt-3 text-xs">
+                    <span class="text-slate-400">
+                        Rendimento líquido
+                    </span>
+
+                    <span class="verde font-bold">
+                        ${moeda(item.juros)}
+                    </span>
+                </div>
+
+                <div class="flex justify-between mt-2 text-xs">
+                    <span class="text-slate-400">
+                        Imposto estimado
+                    </span>
+
+                    <span class="text-white">
+                        ${moeda(item.imposto)}
+                    </span>
+                </div>
+
+                <div class="barra mt-4">
+                    <div style="width:${percentual}%"></div>
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+    document.getElementById("cardsInvestimentos").innerHTML =
+        cards;
+
+
+    // TABELA COMPARATIVA
 
     let tabela = "";
 
+    resultados.forEach(item => {
 
-    for (let mes = 1; mes <= meses; mes++) {
+        tabela += `
 
-        // RENDIMENTO DO SALDO EXISTENTE
+            <tr>
+                <td class="font-bold">${item.nome}</td>
+                <td>${moeda(item.bruto)}</td>
+                <td class="erro">${moeda(item.imposto)}</td>
+                <td class="verde font-bold">${moeda(item.liquido)}</td>
+            </tr>
 
-        saldo *= (1 + taxaMensal);
+        `;
 
-        // APORTE NO FINAL DO MÊS
+    });
 
-        saldo += aporte;
-
-        totalInvestido += aporte;
-
-
-        // REGISTRO ANUAL OU FINAL
-
-        if (mes % 12 === 0 || mes === meses) {
-
-            const rendimento =
-                saldo - totalInvestido;
-
-            const periodoTexto =
-                mes % 12 === 0
-                    ? "Ano " + (mes / 12)
-                    : "Mês " + mes;
-
-            tabela += `
-                <tr>
-                    <td>${periodoTexto}</td>
-                    <td>${moeda(totalInvestido)}</td>
-                    <td class="verde">${moeda(rendimento)}</td>
-                    <td class="azul font-bold">${moeda(saldo)}</td>
-                </tr>
-            `;
-
-        }
-
-    }
+    document.getElementById("tabelaComparacao").innerHTML =
+        tabela;
 
 
-    // RESULTADOS
+    // GRÁFICO VISUAL
 
-    const totalJuros = saldo - totalInvestido;
+    let grafico = "";
+
+    resultados.forEach(item => {
+
+        const percentual =
+            melhor.liquido > 0
+            ? (item.liquido / melhor.liquido) * 100
+            : 0;
+
+        grafico += `
+
+            <div class="mb-5">
+
+                <div class="flex justify-between gap-2 mb-2">
+
+                    <span class="text-sm font-bold">
+                        ${item.nome}
+                    </span>
+
+                    <span class="text-xs azul">
+                        ${moeda(item.liquido)}
+                    </span>
+
+                </div>
+
+                <div class="barra">
+                    <div style="width:${percentual}%"></div>
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
+    document.getElementById("grafico").innerHTML =
+        grafico;
 
 
-    document.getElementById("total").textContent =
-        moeda(saldo);
+    // RESULTADO INDIVIDUAL DO CDB 100% CDI
+
+    const base = resultados.find(
+        item => item.nome === "CDB 100% CDI"
+    );
 
     document.getElementById("investido").textContent =
-        moeda(totalInvestido);
+        moeda(base.investido);
 
     document.getElementById("juros").textContent =
-        moeda(totalJuros);
-
+        moeda(base.juros);
 
     document.getElementById("taxaEquivalente").textContent =
-        porcentagem(taxaMensal * 100);
-
+        porcentagem(base.taxaMensal);
 
     document.getElementById("tempoTotal").textContent =
         meses + (meses === 1 ? " mês" : " meses");
 
 
+    // HISTÓRICO DO CDB 100% CDI
+
+    let historico = "";
+
+    base.historico.forEach(item => {
+
+        const rendimento =
+            item.bruto - item.investido;
+
+        const texto =
+            item.mes % 12 === 0
+            ? "Ano " + (item.mes / 12)
+            : "Mês " + item.mes;
+
+        historico += `
+
+            <tr>
+                <td>${texto}</td>
+
+                <td>${moeda(item.investido)}</td>
+
+                <td class="verde">
+                    ${moeda(rendimento)}
+                </td>
+
+                <td class="azul font-bold">
+                    ${moeda(item.bruto)}
+                </td>
+            </tr>
+
+        `;
+
+    });
+
     document.getElementById("historico").innerHTML =
-        tabela;
+        historico;
 
 
-    // EXIBIR RESULTADOS
+    // EXIBIÇÃO
 
-    document.getElementById("areaResultados")
+    document.getElementById("areaComparacao")
         .classList.remove("hidden");
 
-
     mensagem.textContent =
-        "Simulação calculada com sucesso!";
+        "Comparação realizada com sucesso!";
 
     mensagem.className =
         "verde text-sm mt-4 text-center";
 
-
-    // ROLAR ATÉ OS RESULTADOS
-
-    document.getElementById("areaResultados")
+    document.getElementById("areaComparacao")
         .scrollIntoView({
             behavior: "smooth",
             block: "start"
@@ -709,28 +960,41 @@ function calcular() {
 }
 
 
-// LIMPAR CAMPOS
+// MENSAGEM DE ERRO
+
+function mostrarErro(texto) {
+
+    const mensagem =
+        document.getElementById("mensagem");
+
+    mensagem.textContent = texto;
+
+    mensagem.className =
+        "erro text-sm mt-4 text-center";
+
+}
+
+
+// LIMPAR
 
 function limpar() {
 
     document.getElementById("inicial").value = "";
-
     document.getElementById("aporte").value = "";
-
-    document.getElementById("taxa").value = "";
-
+    document.getElementById("cdi").value = "10";
     document.getElementById("periodo").value = "";
-
-    document.getElementById("tipoTaxa").value = "mensal";
 
     document.getElementById("tipoPeriodo").value = "anos";
 
     document.getElementById("mensagem").textContent = "";
 
-    document.getElementById("areaResultados")
+    document.getElementById("areaComparacao")
         .classList.add("hidden");
 
+    document.getElementById("cardsInvestimentos").innerHTML = "";
+    document.getElementById("tabelaComparacao").innerHTML = "";
     document.getElementById("historico").innerHTML = "";
+    document.getElementById("grafico").innerHTML = "";
 
     document.getElementById("inicial").focus();
 
