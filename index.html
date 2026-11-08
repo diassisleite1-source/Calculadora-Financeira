@@ -8,7 +8,6 @@
 
 <title>Calculadora Financeira</title>
 
-<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
@@ -222,6 +221,16 @@ input, select, button {
             <p class="text-xs text-slate-400 mt-2">
                 Informe a taxa de rendimento do investimento.
             </p>
+
+            <!-- NOVO BOTÃO DE PESQUISA -->
+
+            <button
+                type="button"
+                onclick="pesquisarMelhoresJuros()"
+                class="botao w-full mt-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950"
+            >
+                🔎 PESQUISAR MELHORES JUROS
+            </button>
 
         </div>
 
@@ -457,6 +466,33 @@ function porcentagem(valor) {
         minimumFractionDigits: 2,
         maximumFractionDigits: 4
     }) + "%";
+
+}
+
+
+// NOVA FUNÇÃO: PESQUISAR MELHORES JUROS
+
+function pesquisarMelhoresJuros() {
+
+    const pesquisa = [
+        "melhores taxas CDB Brasil hoje percentual CDI",
+        "LCI LCA melhores taxas rendimento carência",
+        "Tesouro Selic taxas atuais Tesouro Direto",
+        "Tesouro IPCA taxas atuais vencimentos",
+        "rendimento da poupança Banco Central"
+    ];
+
+    const consulta = pesquisa.join(" ");
+
+    const url =
+        "https://www.google.com/search?q=" +
+        encodeURIComponent(consulta);
+
+    window.open(
+        url,
+        "_blank",
+        "noopener,noreferrer"
+    );
 
 }
 
