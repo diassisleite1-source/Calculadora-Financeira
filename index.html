@@ -11,7 +11,9 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon-192.svg" type="image/svg+xml">
 
+<!-- Tailwind e Chart.js via CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 * { box-sizing: border-box; }
@@ -261,7 +263,10 @@ input, select, button { font-size: 16px; }
 
     <h2 class="secao-titulo">📊 Comparação visual</h2>
 
-    <div id="grafico" class="resultado mb-6"></div>
+    <!-- Gráfico com Chart.js -->
+    <div class="resultado mb-6 p-4" style="height: 320px;">
+        <canvas id="meuGrafico"></canvas>
+    </div>
 
     <h2 class="secao-titulo">💵 Simulação de juros compostos</h2>
 
@@ -384,6 +389,7 @@ input, select, button { font-size: 16px; }
 <script>
 
 let ultimaSimulacao = null;
+let instanciaGrafico = null; // Instância do Chart.js
 
 const CHAVE_HISTORICO = "calculadora_financeira_historico";
 
@@ -391,99 +397,79 @@ const CHAVE_HISTORICO = "calculadora_financeira_historico";
 // FORMATAÇÃO
 
 function moeda(valor) {
-
     return Number(valor).toLocaleString("pt-BR", {
         style: "currency",
         currency: "BRL"
     });
-
 }
 
 function porcentagem(valor) {
-
     return Number(valor).toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 4
     }) + "%";
-
 }
 
 
 // IMPOSTO DE RENDA ESTIMADO
 
 function aliquotaIR(meses) {
-
     const dias = meses * 30;
-
     if (dias <= 180) return 0.225;
     if (dias <= 360) return 0.20;
     if (dias <= 720) return 0.175;
-
     return 0.15;
-
 }
 
 
 // INVESTIMENTOS
 
 function obterInvestimentos(cdi) {
-
     return [
-
         {
             nome: "CDB 100% CDI",
             descricao: "Rendimento de 100% do CDI",
             taxa: cdi,
             imposto: true
         },
-
         {
             nome: "CDB 110% CDI",
             descricao: "Rendimento de 110% do CDI",
             taxa: cdi * 1.10,
             imposto: true
         },
-
         {
             nome: "LCI 90% CDI",
             descricao: "Rendimento de 90% do CDI",
             taxa: cdi * 0.90,
             imposto: false
         },
-
         {
             nome: "LCA 90% CDI",
             descricao: "Rendimento de 90% do CDI",
             taxa: cdi * 0.90,
             imposto: false
         },
-
         {
             nome: "Tesouro Selic",
             descricao: "Taxa aproximada igual ao CDI",
             taxa: cdi,
             imposto: true
         },
-
         {
             nome: "Poupança",
             descricao: "Premissa ilustrativa de 6% ao ano",
             taxa: 6,
             imposto: false
         }
-
     ];
-
 }
 
 
 // SIMULAÇÃO
 
 function simular(inicial, aporte, meses, taxaAnual, temIR) {
-
-    const taxaMensal =
-        Math.pow(1 + taxaAnual / 100, 1 / 12) - 1;
-
+    const taxaMensal = Math.pow(1 + taxaAnual / 100, 1 / 12) - 1;
     let aplicacoes = [];
 
     if (inicial > 0) {
@@ -498,63 +484,50 @@ function simular(inicial, aporte, meses, taxaAnual, temIR) {
     let totalInvestido = inicial;
 
     for (let mes = 1; mes <= meses; mes++) {
-
         aplicacoes.forEach(aplicacao => {
             aplicacao.saldo *= (1 + taxaMensal);
             aplicacao.idade++;
         });
 
         if (aporte > 0) {
-
             aplicacoes.push({
                 saldo: aporte,
                 investido: aporte,
                 idade: 0
             });
-
             totalInvestido += aporte;
-
         }
 
         if (mes % 12 === 0 || mes === meses) {
-
             const patrimonioBruto = aplicacoes.reduce(
                 (total, aplicacao) => total + aplicacao.saldo,
                 0
             );
-
             historico.push({
                 mes,
                 investido: totalInvestido,
                 bruto: patrimonioBruto
             });
-
         }
-
     }
 
     let patrimonioBruto = 0;
     let impostoTotal = 0;
 
     aplicacoes.forEach(aplicacao => {
-
         patrimonioBruto += aplicacao.saldo;
-
         const rendimento = Math.max(
             0,
             aplicacao.saldo - aplicacao.investido
         );
-
         if (temIR) {
             impostoTotal += rendimento * aliquotaIR(aplicacao.idade);
         }
-
     });
 
     const patrimonioLiquido = patrimonioBruto - impostoTotal;
 
     return {
-
         investido: totalInvestido,
         bruto: patrimonioBruto,
         imposto: impostoTotal,
@@ -562,28 +535,77 @@ function simular(inicial, aporte, meses, taxaAnual, temIR) {
         juros: patrimonioLiquido - totalInvestido,
         taxaMensal: taxaMensal * 100,
         historico
-
     };
+}
 
+
+// RENDERIZAR GRÁFICO COM CHART.JS
+
+function renderizarGrafico(resultados) {
+    const ctx = document.getElementById('meuGrafico').getContext('2d');
+
+    if (instanciaGrafico) {
+        instanciaGrafico.destroy();
+    }
+
+    const labels = resultados.map(r => r.nome);
+    const dadosLiquidos = resultados.map(r => r.liquido);
+    const dadosInvestidos = resultados.map(r => r.investido);
+
+    instanciaGrafico = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Patrimônio Líquido (R$)',
+                    data: dadosLiquidos,
+                    backgroundColor: '#38bdf8',
+                    borderRadius: 6
+                },
+                {
+                    label: 'Total Investido (R$)',
+                    data: dadosInvestidos,
+                    backgroundColor: '#475569',
+                    borderRadius: 6
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#f1f5f9', font: { size: 12 } }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#94a3b8' },
+                    grid: { color: '#334155' }
+                },
+                y: {
+                    ticks: { color: '#94a3b8' },
+                    grid: { color: '#334155' }
+                }
+            }
+        }
+    });
 }
 
 
 // MENSAGEM
 
 function mostrarErro(texto) {
-
     const mensagem = document.getElementById("mensagem");
-
     mensagem.textContent = texto;
     mensagem.className = "erro text-sm mt-4 text-center";
-
 }
 
 
 // CÁLCULO PRINCIPAL
 
 function calcularTudo() {
-
     const inicialInput = document.getElementById("inicial");
     const aporteInput = document.getElementById("aporte");
     const cdiInput = document.getElementById("cdi");
@@ -634,7 +656,6 @@ function calcularTudo() {
     const investimentos = obterInvestimentos(cdi);
 
     let resultados = investimentos.map(investimento => {
-
         const resultado = simular(
             inicial,
             aporte,
@@ -642,9 +663,7 @@ function calcularTudo() {
             investimento.taxa,
             investimento.imposto
         );
-
         return { ...investimento, ...resultado };
-
     });
 
     resultados.sort((a, b) => b.liquido - a.liquido);
@@ -652,16 +671,13 @@ function calcularTudo() {
     const melhor = resultados[0];
 
     ultimaSimulacao = {
-
         data: new Date().toISOString(),
         inicial,
         aporte,
         cdi,
         meses,
         melhorNome: melhor.nome,
-
         resultados: resultados.map(item => ({
-
             nome: item.nome,
             descricao: item.descricao,
             taxa: item.taxa,
@@ -670,9 +686,7 @@ function calcularTudo() {
             imposto: item.imposto,
             liquido: item.liquido,
             juros: item.juros
-
         }))
-
     };
 
     document.getElementById("nomeMelhor").textContent = melhor.nome;
@@ -683,28 +697,22 @@ function calcularTudo() {
     let cards = "";
 
     resultados.forEach((item, indice) => {
-
         const percentual = melhor.liquido > 0
             ? item.liquido / melhor.liquido * 100
             : 0;
 
         cards += `
-
             <div class="investimento ${indice === 0 ? "melhor" : ""}">
-
                 <div class="flex justify-between items-start gap-2">
-
                     <div>
                         <h3 class="font-bold text-base">${item.nome}</h3>
                         <p class="text-xs text-slate-400 mt-1">
                             ${item.descricao}
                         </p>
                     </div>
-
                     ${indice === 0
                         ? '<span class="tag">MELHOR RESULTADO</span>'
                         : ''}
-
                 </div>
 
                 <p class="text-xs text-slate-400 mt-4">
@@ -728,11 +736,8 @@ function calcularTudo() {
                 <div class="barra mt-4">
                     <div style="width:${percentual}%"></div>
                 </div>
-
             </div>
-
         `;
-
     });
 
     document.getElementById("cardsInvestimentos").innerHTML = cards;
@@ -741,43 +746,16 @@ function calcularTudo() {
 
     document.getElementById("tabelaComparacao").innerHTML =
         resultados.map(item => `
-
             <tr>
                 <td class="font-bold">${item.nome}</td>
                 <td>${moeda(item.bruto)}</td>
                 <td class="erro">${moeda(item.imposto)}</td>
                 <td class="verde font-bold">${moeda(item.liquido)}</td>
             </tr>
-
         `).join("");
 
-    // GRÁFICO
-
-    document.getElementById("grafico").innerHTML =
-        resultados.map(item => {
-
-            const percentual = melhor.liquido > 0
-                ? item.liquido / melhor.liquido * 100
-                : 0;
-
-            return `
-
-                <div class="mb-5">
-
-                    <div class="flex justify-between gap-2 mb-2">
-                        <span class="text-sm font-bold">${item.nome}</span>
-                        <span class="text-xs azul">${moeda(item.liquido)}</span>
-                    </div>
-
-                    <div class="barra">
-                        <div style="width:${percentual}%"></div>
-                    </div>
-
-                </div>
-
-            `;
-
-        }).join("");
+    // GRÁFICO (Chart.js)
+    renderizarGrafico(resultados);
 
     // RESULTADO BASE: CDB 100% CDI
 
@@ -797,30 +775,24 @@ function calcularTudo() {
 
     document.getElementById("historico").innerHTML =
         base.historico.map(item => {
-
             const rendimento = item.bruto - item.investido;
-
             const texto = item.mes % 12 === 0
                 ? "Ano " + (item.mes / 12)
                 : "Mês " + item.mes;
 
             return `
-
                 <tr>
                     <td>${texto}</td>
                     <td>${moeda(item.investido)}</td>
                     <td class="verde">${moeda(rendimento)}</td>
                     <td class="azul font-bold">${moeda(item.bruto)}</td>
                 </tr>
-
             `;
-
         }).join("");
 
     document.getElementById("areaComparacao").classList.remove("hidden");
 
     const mensagem = document.getElementById("mensagem");
-
     mensagem.textContent = "Comparação realizada com sucesso!";
     mensagem.className = "verde text-sm mt-4 text-center";
 
@@ -828,77 +800,55 @@ function calcularTudo() {
         behavior: "smooth",
         block: "start"
     });
-
 }
 
 
 // HISTÓRICO LOCAL
 
 function lerHistorico() {
-
     try {
-
         const dados = localStorage.getItem("calculadora_financeira_historico");
-
         if (!dados) return [];
-
         const lista = JSON.parse(dados);
-
         return Array.isArray(lista) ? lista : [];
-
     } catch (erro) {
-
         return [];
-
     }
-
 }
 
 
 // SALVAR SIMULAÇÃO
 
 function salvarSimulacao() {
-
     if (!ultimaSimulacao) {
         alert("Primeiro realize uma simulação.");
         return;
     }
 
     const historico = lerHistorico();
-
     const registro = {
         ...ultimaSimulacao,
         id: Date.now()
     };
 
     try {
-
         historico.unshift(registro);
-
         localStorage.setItem(
             "calculadora_financeira_historico",
             JSON.stringify(historico)
         );
-
         alert("Simulação salva com sucesso!");
-
         mostrarHistorico();
-
     } catch (erro) {
-
         alert("Não foi possível salvar. Verifique o espaço disponível.");
-
     }
-
 }
 
 
 // MOSTRAR HISTÓRICO
 
 function mostrarHistorico() {
-
     const historico = lerHistorico();
-
     const area = document.getElementById("areaHistorico");
     const lista = document.getElementById("listaHistorico");
 
@@ -906,22 +856,16 @@ function mostrarHistorico() {
     lista.innerHTML = "";
 
     if (historico.length === 0) {
-
         lista.textContent = "Nenhuma simulação salva ainda.";
-
         area.scrollIntoView({ behavior: "smooth" });
-
         return;
-
     }
 
     historico.forEach(registro => {
-
         const card = document.createElement("div");
         card.className = "resultado";
 
         const data = new Date(registro.data);
-
         const melhor = registro.resultados.find(
             item => item.nome === registro.melhorNome
         );
@@ -959,57 +903,44 @@ function mostrarHistorico() {
         excluir.onclick = () => excluirSimulacao(registro.id);
 
         botoes.append(pdf, excluir);
-
         card.append(dataTexto, titulo, valor, detalhes, botoes);
         lista.appendChild(card);
-
     });
 
     area.scrollIntoView({
         behavior: "smooth",
         block: "start"
     });
-
 }
 
 
 // EXCLUIR SIMULAÇÃO
 
 function excluirSimulacao(id) {
-
     if (!confirm("Deseja excluir esta simulação?")) return;
-
     const historico = lerHistorico().filter(
         item => item.id !== id
     );
-
     localStorage.setItem(
         "calculadora_financeira_historico",
         JSON.stringify(historico)
     );
-
     mostrarHistorico();
-
 }
 
 
 // APAGAR HISTÓRICO
 
 function apagarHistorico() {
-
     if (!confirm("Deseja apagar todas as simulações salvas?")) return;
-
     localStorage.removeItem("calculadora_financeira_historico");
-
     mostrarHistorico();
-
 }
 
 
 // PDF
 
 function escaparHTML(valor) {
-
     return String(valor).replace(/[&<>"']/g, caractere => ({
         "&": "&amp;",
         "<": "&lt;",
@@ -1017,20 +948,16 @@ function escaparHTML(valor) {
         '"': "&quot;",
         "'": "&#39;"
     })[caractere]);
-
 }
 
 
 function baixarPDF(id) {
-
     let registro = ultimaSimulacao;
 
     if (id !== undefined) {
-
         registro = lerHistorico().find(
             item => item.id === id
         );
-
     }
 
     if (!registro) {
@@ -1043,126 +970,91 @@ function baixarPDF(id) {
     );
 
     const linhas = registro.resultados.map(item => `
-
         <tr>
             <td>${escaparHTML(item.nome)}</td>
             <td>${moeda(item.bruto)}</td>
             <td>${moeda(item.imposto)}</td>
             <td>${moeda(item.liquido)}</td>
         </tr>
-
     `).join("");
 
     const janela = window.open("", "_blank");
 
     if (!janela) {
-
         alert("Permita pop-ups no navegador para gerar o PDF.");
-
         return;
-
     }
 
     janela.document.write(`
-
         <!DOCTYPE html>
         <html lang="pt-BR">
-
         <head>
-
             <meta charset="UTF-8">
-
             <title>Relatório Financeiro</title>
-
             <style>
-
                 body {
                     font-family: Arial, sans-serif;
                     padding: 30px;
                     color: #1e293b;
                 }
-
                 h1 { color: #0369a1; }
-
                 .resumo {
                     background: #e0f2fe;
                     padding: 18px;
                     border-radius: 10px;
                     margin: 20px 0;
                 }
-
                 table {
                     width: 100%;
                     border-collapse: collapse;
                     margin-top: 20px;
                 }
-
                 th, td {
                     border-bottom: 1px solid #cbd5e1;
                     padding: 10px 5px;
                     text-align: right;
                     font-size: 12px;
                 }
-
                 th:first-child, td:first-child {
                     text-align: left;
                 }
-
                 th { background: #f1f5f9; }
-
                 .verde {
                     color: #15803d;
                     font-weight: bold;
                 }
-
                 .rodape {
                     margin-top: 30px;
                     font-size: 11px;
                     color: #64748b;
                     line-height: 1.5;
                 }
-
             </style>
-
         </head>
-
         <body>
-
             <h1>📈 Calculadora Financeira</h1>
-
             <p>Relatório de comparação de investimentos</p>
-
             <p>
                 Data:
                 ${new Date(registro.data).toLocaleString("pt-BR")}
             </p>
 
             <div class="resumo">
-
                 <h2>Melhor resultado estimado</h2>
-
                 <h3>${escaparHTML(registro.melhorNome)}</h3>
-
                 <h2 class="verde">
                     ${moeda(melhor ? melhor.liquido : 0)}
                 </h2>
-
             </div>
 
             <h3>Dados da simulação</h3>
-
             <p>Valor inicial: ${moeda(registro.inicial)}</p>
-
             <p>Aporte mensal: ${moeda(registro.aporte)}</p>
-
             <p>CDI de referência: ${registro.cdi}% ao ano</p>
-
             <p>Período: ${registro.meses} meses</p>
 
             <h3>Comparação de investimentos</h3>
-
             <table>
-
                 <thead>
                     <tr>
                         <th>Investimento</th>
@@ -1171,50 +1063,39 @@ function baixarPDF(id) {
                         <th>Líquido</th>
                     </tr>
                 </thead>
-
                 <tbody>${linhas}</tbody>
-
             </table>
 
             <div class="rodape">
-
                 <p>
                     Relatório de simulação matemática.
                     Não constitui recomendação de investimento.
                 </p>
-
                 <p>
                     Taxas, impostos e custos podem variar.
                     Os valores são estimativas e não representam
                     ofertas reais de instituições financeiras.
                 </p>
-
             </div>
 
             <script>
-
                 window.onload = function() {
                     setTimeout(function() {
                         window.print();
                     }, 500);
                 };
-
             <\/script>
-
         </body>
         </html>
-
     `);
 
     janela.document.close();
-
 }
 
 
 // LIMPAR CAMPOS
 
 function limpar() {
-
     document.getElementById("inicial").value = "";
     document.getElementById("aporte").value = "";
     document.getElementById("cdi").value = "10";
@@ -1222,29 +1103,27 @@ function limpar() {
     document.getElementById("tipoPeriodo").value = "anos";
 
     document.getElementById("mensagem").textContent = "";
-
     document.getElementById("areaComparacao").classList.add("hidden");
 
+    if (instanciaGrafico) {
+        instanciaGrafico.destroy();
+        instanciaGrafico = null;
+    }
+
     ultimaSimulacao = null;
-
     document.getElementById("inicial").focus();
-
 }
 
 
 // SERVICE WORKER
 
 if ("serviceWorker" in navigator) {
-
     window.addEventListener("load", () => {
-
         navigator.serviceWorker.register("./sw.js")
             .catch(erro => {
                 console.error("Erro no Service Worker:", erro);
             });
-
     });
-
 }
 
 </script>
